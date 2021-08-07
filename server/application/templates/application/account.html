@@ -1,0 +1,115 @@
+{% extends 'application/home.html' %}
+
+
+ {% block content %}
+
+    <div>
+    <input type="text" name="" id="amount">
+    <p id='balance'>balance</p>
+    <button id='deposit'>Deposite</button>
+    <button id='withdraw'>Withdraw</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.1-rc.0/web3.min.js" integrity="sha512-LzEs89ZBZUbU92wmmvNgZKNnjKSFMTUv+p80RYPH0F9GhONgYyIUnvah90y5Ztir4ig9f3yUXSfUmIMIx5Yn0g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
+
+
+    <script>
+        var contract;
+
+        $(document).ready(function(){
+            web3 = new Web3(window.web3.currentProvider);
+            
+            var address = "0xf42A06f2a75aeF85BCbd7Ab2c0fe6860e6b5e127";
+            var abi = [
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "amount",
+				"type": "int256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "amount",
+				"type": "int256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	}
+];
+            contract = new web3.eth.Contract(abi, address);
+
+            contract.methods.getBalance().call().then(function(balance){
+                $('#balance').html(balance);
+            })
+        })
+
+
+
+        $('#deposit').click(function(){
+            var amt = 0;
+            amt = parseInt($('#amount').val());
+            
+            web3.eth.requestAccounts().then(function(accounts){
+                var acc = accounts[0];
+                //console.log(acc);
+                return contract.methods.deposit(amt).send({from : acc});
+            }).then(function (tx){
+                console.log(tx)
+            }).catch(function(tx){
+                console.log(tx)
+            })
+        })
+
+
+        $('#withdraw').click(function(){
+            var amt = 0;
+            amt = parseInt($('#amount').val());
+            
+            web3.eth.requestAccounts().then(function(accounts){
+                var acc = accounts[0];
+                //console.log(acc);
+                return contract.methods.withdraw(amt).send({from : acc});
+            }).then(function (tx){
+                console.log(tx)
+            }).catch(function(tx){
+                console.log(tx)
+            })
+        })
+
+    </script>
+
+{% endblock content%}

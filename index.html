@@ -54,57 +54,58 @@
         $(document).ready(function(){
             web3 = new Web3(window.web3.currentProvider);
             
-            var address = "0xf42A06f2a75aeF85BCbd7Ab2c0fe6860e6b5e127";
+            var address = "0x3723EBB178e4eF4e77585AE9De580005Bf50d87B";
             var abi = [
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getBalance",
-		"outputs": [
-			{
-				"name": "",
-				"type": "int256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "amount",
-				"type": "int256"
-			}
-		],
-		"name": "withdraw",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "amount",
-				"type": "int256"
-			}
-		],
-		"name": "deposit",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	}
-];
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "getBalance",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "int256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "amount",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "withdraw",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "amount",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "deposit",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                }
+            ];
+
             contract = new web3.eth.Contract(abi, address);
 
             contract.methods.getBalance().call().then(function(balance){
