@@ -1,29 +1,103 @@
+* {
+    margin: 0;
+    padding: 0;
+}
 
+a {
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
 
+a:hover {
+    color: black;
+}
 
+.content-area {
+    margin-top: 2%;
+}
 
+/* css for the navbar */
+.nav-body {
+    background: rgb(2, 0, 36) !important;
+    background: linear-gradient(
+        87deg,
+        rgba(2, 0, 36, 1) 0%,
+        rgba(52, 152, 219, 1) 38%,
+        rgba(0, 212, 255, 1) 100%
+    ) !important;
+}
 
+.nav-body a {
+    color: white !important;
+}
+/* css for a single product on the home page */
+.card {
+    background-color: rgba(235, 235, 235, 0.404);
+    margin-bottom: 20px !important;
+    max-height: 18rem;
+    min-height: 18rem;
+}
 
+.card:hover {
+    box-shadow: 5px 5px 15px 5px #000000;
+}
+.p-img {
+    max-height: 8rem;
+    max-width: 8rem;
+    min-height: 8rem;
+    min-width: 8rem;
+    border-radius: 50%;
+}
 
+/* css for the details page */
+.details-holder {
+    border: solid 2px rgba(52, 152, 219, 1);
+    padding: 20px;
+    border-radius: 20px;
+}
+.d-img {
+    max-height: 25rem;
+    max-width: 25rem;
+    min-height: 12rem;
+    min-width: 12rem;
+}
 
+.d-btn {
+    margin-top: 2%;
+}
 
+.d-btn-inside {
+    background: #3498db;
+    background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+    background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+    background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+    background-image: -o-linear-gradient(top, #3498db, #2980b9);
+    background-image: linear-gradient(to bottom, #3498db, #2980b9);
+    -webkit-border-radius: 28;
+    -moz-border-radius: 28;
+    border-radius: 28px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 8px 35px 8px 35px;
+    text-decoration: none;
+}
 
+.d-btn-inside:hover {
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
+}
 
+/* css for the account section */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.account-eth {
+    position: absolute;
+    left: 6%;
+    bottom: 10%;
+}

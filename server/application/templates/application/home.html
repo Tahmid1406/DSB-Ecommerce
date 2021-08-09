@@ -12,7 +12,7 @@
     <title>Shop</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light nav-body">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home'%}">SHOP</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,32 +35,51 @@
                     </li>
                 </ul>
             </div>
+
+            <div class="d-flex">
+                <a class="nav-link" href="{% url 'account'%}">Account</a>
+                <a class="nav-link" href="{% url 'register'%}">Register</a>
+            </div>
         </div>
     </nav>
 
 
-    {% comment %} <img src="{% static '/media/9.jpg' %}"/>  {% endcomment %}
 
-    {%block content%}
-        {% if data %}
-            {% for product in data %}
-                <div class="card" style="width: 18rem;">
-                    <img src="/media/{{product.image}}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.title}}</h5>
-                        <p class="card-text">Brand : {{product.brand}}</p>
-                        <p class="card-text">Price : {{product.price}}</p>
-                        <a href="#" class="btn btn-primary">Buy Now</a>
-                    </div>
-                </div>
-            {%endfor%}
+    <div class="container">
+        {% comment %} <img src="{% static '/media/9.jpg' %}"/>  {% endcomment %}
 
-        {% endif %}
-        
-
-    {%endblock content%}
+        <div class="content-area">
+            <div class="row">
+                
+                {% if messages %}
+                    {% for mes in messages%}
+                        <div class="alert alert-{{mes.tags}}">
+                            {{mes}}
+                        </div>
+                    {%endfor%}
+                {% endif %}    
+                {%block content%}
+                    {% if data %}
+                        {% for product in data %}                           
+                            <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <img src="/media/{{product.image}}" class="p-img card-img-top" alt="product-img"> 
+                                            <h5 class="card-title">{{product.title}}</h5>
+                                            <p class="card-text">Brand : {{product.brand}}</p>
+                                            <p class="card-text">Price : {{product.price}}</p>                                           
+                                        </div>
+                                    <a class='stretched-link' href="product/{{product.slug}}/{{product.id}}"></a>   
+                                    </div>
+                            </div>
+                        
+                        {%endfor%}
+                    {% endif %}
+                {%endblock content%}
+            </div>
+        </div>
     
-
+    </div>
     
 
 </body>

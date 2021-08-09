@@ -1,22 +1,17 @@
 {% extends 'application/home.html' %}
-
+{% load crispy_forms_tags %}
 {% block content%}
     <div class="register-form">
         <form method="post">
             {% csrf_token %}
             <fieldset class='form-group'>
                 <legend class='border-bottm mb-4'>Register Your Account</legend>
-                {{form.username}} <br>
                 
-                {{form.email}} <br>
-
-                {{form.password1}} <br>
-                
-                {{form.password2}} <br>
+                {{form | crispy}} <br>
 
             </fieldset>
             <div class='form-group text-center'>
-                <button class='btn btn-outline-info mb-5' type='submit'>SingUp</button>
+                <button class='btn btn-outline-info mb-5' type='submit'>Login</button>
             </div>
         </form>
 

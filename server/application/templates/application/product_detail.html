@@ -1,0 +1,56 @@
+{% extends 'application/home.html' %}
+
+{%block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
+
+    <div class="row details-holder">
+        <div class="col-md-6 text-center">
+            <img src="/media/{{data.image}}" class='d-img' alt="product-img" />
+        </div>
+        <div class="col-md-6">
+            <h5>{{data.title}}</h3>
+            <h6>Brand : {{data.brand}}</h2>
+            <h6>Category : {{data.category}}</h2>
+            <p>{{data.details}}</p>
+            <h6>Price : {{data.price}} tk</h2>
+        </div>
+        
+        <div class="col-md-12 d-btn text-center">
+            <a class='btn btn-primary d-btn-inside' id='addBtn' href="#">Buy Now</a> 
+        </div>
+
+ 
+
+
+    </div>
+
+
+    <div type='hidden'>
+        <input type='hidden' id='title' value="{{data.title}}" />
+        <input type='hidden' id='id' value="{{data.id}}" />
+        <input type='hidden' id='brand' value="{{data.brand}}" />
+        <input type='hidden' id='category' value="{{data.category}}" />
+        <input type='hidden' id='price' value="{{data.price}}" />
+    </div>
+        
+   
+   <script>
+        $('#addBtn').on('click', function(){
+            var _vm = $(this);
+            var title = $('#title').val();
+            var brand = $('#brand').val();
+            var category = $('#category').val();
+            var price = $('#price').val();
+            var id = $('#id').val();
+            //console.log(title);
+            //console.log(brand);
+            //console.log(category);
+            //console.log(price);
+            //console.log(id);
+            
+        })
+    </script>
+    
+{%endblock content %}
+
+ 

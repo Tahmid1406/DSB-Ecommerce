@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -30,6 +30,30 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+
+class UserAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    step = models.IntegerField()
+    type = models.IntegerField()
+    isFlaggedFraud = models.IntegerField()
+
+    amount = models.DecimalField(max_digits=50, decimal_places=5, default="")
+    oldbalanceOrg = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+    newbalanceOrig = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+    oldbalanceDest = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+    newbalanceDest = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+    errorBalanceOrig = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+    errorBalanceDest = models.DecimalField(
+        max_digits=50, decimal_places=5, default="")
+
+    def __str__(self):
+        return self.user
 
 # class User(AbstractUser):
 #     is_customer = models.BooleanField(default=False)
