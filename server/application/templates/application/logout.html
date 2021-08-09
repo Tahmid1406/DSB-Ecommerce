@@ -1,0 +1,15 @@
+{% extends 'application/home.html' %}
+
+{% block content%}
+    <div class="register-form">
+        
+        <h3>Account Logged Out.</h3>
+
+        <div class="border-top pt-3">
+            <small class='text-muted'>
+                Login to your account again. <a class='ml-2' href='{% url 'login' %}'>Login</a>
+            </small>
+        </div>
+    </div>
+
+{%endblock content%}
