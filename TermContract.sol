@@ -1,4 +1,4 @@
- pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.7.0 <0.9.0;
  
  
  
@@ -84,19 +84,29 @@
 contract OrderContract is TermContract{
     
     // assuming that 
-    // 0 = default
-    // 1= order Placed
-    // 2 = order confirmed
-    // 3 = order shipped
-    // 4 = product delivered
-    // 5 = time limit exceeded
+    // 0 = order Placed
+    // 1 = order confirmed
+    // 2 = order shipped
+    // 3 = product delivered
+    // 4 = fraudulent behavior detected
+    // 5 = time limit Time_limit_exceeded
+    // 6 = product not satisfactory
     
     string viewCurrentTrace = "There is no current order";
     
     
     mapping(address => Order) public OrderMap;
     
-    enum OrderCurrentState { Order_Placed, Order_received, Order_confirmed, Order_Shipped, Order_Failed }
+    enum OrderCurrentState {
+        Order_Placed,
+        Order_confirmed, 
+        Order_Shipped, 
+        Product_delivered, 
+        Fraudulent_behavior_detected, 
+        Time_limit_exceeded, 
+        Product_not_satisfactory
+    }
+    
     OrderCurrentState ordercurrentstatus;
     
     
@@ -160,11 +170,13 @@ contract OrderContract is TermContract{
          order_placing_time = block.timestamp;
          
          if(TermContract.isFraud(amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, newbalanceDest, transactionType) == true){
+             ordercurrentstatus = OrderCurrentState.Fraudulent_behavior_detected;
              emit OrderElimination(seller_address, buyer_address, OrderStatus.msz2);
          }
          else{
              OrderMap[buyer_address] = Order(buyer_address, seller_address, product_id, delivery_time, product_price, block.timestamp);
-             emit OrderCreation(seller_address, buyer_address,OrderStatus.msz2);
+             ordercurrentstatus = OrderCurrentState.Order_Placed;
+             emit OrderCreation(seller_address, buyer_address,OrderStatus.msz1);
              viewCurrentTrace = "Order Placed";
          }
     }
@@ -175,20 +187,21 @@ contract OrderContract is TermContract{
         order_delivery_time = block.timestamp;
         
         if(order_delivery_time - order_placing_time <= delivery_time){
+            ordercurrentstatus = OrderCurrentState.Order_Shipped;
             emit OrderDelivered(order.seller_address, order.buyer_address, OrderStatus.msz3);
         }
         else{
+            ordercurrentstatus = OrderCurrentState.Time_limit_exceeded;
             emit OrderCancellaition(order.seller_address, order.buyer_address, OrderStatus.msz4);
         }
-        
-         
-
     }
-    
-
     function getCurrentStatus() public view returns(string memory) {
         return viewCurrentTrace;
     }
-
+    function Order_Status() public view returns (OrderCurrentState) {
+    return ordercurrentstatus;
+    }
+    
+    
     
 }
