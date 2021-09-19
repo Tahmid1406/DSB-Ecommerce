@@ -1,11 +1,6 @@
 pragma solidity >=0.7.0 <0.9.0;
- 
- 
- 
- 
- 
+
  contract TermContract{
-    
     
     //variables as per dataset
     int oldbalanceOrg;
@@ -35,6 +30,7 @@ pragma solidity >=0.7.0 <0.9.0;
     }
     
     function checkFraud() view internal returns (bool){
+        
         bool result; 
         
         // (type = TRANSFER) and (newbalanceDest <= 0) and (oldbalanceDest <= 0) and (oldbalanceOrg >= 64083.54) 
@@ -48,7 +44,7 @@ pragma solidity >=0.7.0 <0.9.0;
         if(transactionType == Type.TRANSFER && oldbalanceOrg <= 0 && oldbalanceDest <= 0 && oldbalanceOrg >= 64084){
             result = true;
         }else if(amount >= 491518 && newbalanceOrig <= 0 && oldbalanceOrg >= 790332 ){
-             result = true;
+            result = true;
         }else if(transactionType == Type.TRANSFER && newbalanceDest <= 0 && oldbalanceDest <= 0){
             result = true;
         }else if( oldbalanceDest <= 667244 && oldbalanceOrg >= 1048388 && amount >= 994453){
@@ -56,103 +52,126 @@ pragma solidity >=0.7.0 <0.9.0;
         }else if(transactionType == Type.TRANSFER && newbalanceDest <= 0 && oldbalanceDest <= 0 && oldbalanceOrg >= 64084 && amount >= 84007){
             result = true;
         }else if(transactionType == Type.CASH_OUT && newbalanceOrig <= 0 && oldbalanceOrg >= 555575){ 
-            
+            result = true;
         }else{
             result = false;
         }
-        
+        return result;
     }
-    
-    
-    
 }
-
-
-
-
-
-
-
-
-
-
-
 
 // Order contract starts here
 // Order contract starts here
 
 contract OrderContract is TermContract{
     
-    // assuming that 
-    // 0 = order Placed
-    // 1 = order confirmed
-    // 2 = order shipped
-    // 3 = product delivered
-    // 4 = fraudulent behavior detected
-    // 5 = time limit Time_limit_exceeded
-    // 6 = product not satisfactory
     
-    string viewCurrentTrace = "There is no current order";
+    address contract_deployer;
+    address customer_address = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
+    address seller_address = 0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c;
+    address delivery_man_address = 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db;
     
     
-    mapping(address => Order) public OrderMap;
+    mapping(address => Order) OrderMap;
+    mapping(address => int) public Review;
+    
+    
     
     enum OrderCurrentState {
         Order_Placed,
-        Order_confirmed, 
+        Order_Confirmed, 
         Order_Shipped, 
-        Product_delivered, 
-        Fraudulent_behavior_detected, 
-        Time_limit_exceeded, 
-        Product_not_satisfactory
+        Product_Delivered,
+        Order_Reached,
+        Fraudulent_Behavior_Detected, 
+        Time_Limit_Exceeded, 
+        Product_Not_Satisfactory
+        
     }
-    
     OrderCurrentState ordercurrentstatus;
     
     
     
-    enum OrderStatus { msz1, msz2, msz3, msz4 }
-    
-        string msz1 = "Order Placed successfully";
-        string msz2 = "Fraud detected,Order cancelled!";
+        string msz1 = "Order placed successfully";
+        string msz2 = "Fraud detected, order cancelled!";
+        string msz7 = "Order confirmed successfully";
         string msz3 = "Order delivered successfully";
-        string msz4 = "Out of time, Order cancelled";
+        string msz4 = "Out of delivery time, order cancelled";
+        string msz5 = "Order shipped successfully";
+        string msz6 = "Buyer is not satisfied with product";
+        string msz8 = "Delivey man is delivering the order";
+        string msz9 = "Order reached to customer";
+        
     
-        address buyer_address;
-        address seller_address;
+        //address buyer_address;
+        //address seller_address;
         string product_id;
         uint256 delivery_time;
         int product_price;
-        OrderStatus status;
         uint256 order_time;
+        uint256 response;
     
    struct Order{
-        address buyer_address;
+        address customer_address;
         address seller_address;
         string product_id;
         uint256 delivery_time;
         int product_price;
         uint order_time;
     }
-    
     Order order;
+    
+    //struct Review{
+      //  address seller_address;
+        //int counter;
+    //}
     
     uint256 order_placing_time;
     uint256 order_delivery_time;
-   
+    string viewCurrentTrace = "Not placed any order";
+    string description = "null";
+    
+    
+    modifier onlyContractDeployer(){
+        require(msg.sender == contract_deployer);
+        _;
+    }
+    
+    modifier onlyCustomer(){
+        require(msg.sender == customer_address);
+        _;
+    }
+    
+     modifier onlySeller(){
+        require(msg.sender == seller_address);
+        _;
+    }
+    
+      modifier onlyDeliveryMan(){
+        require(msg.sender == delivery_man_address);
+        _;
+    }
+    
+    
+    constructor() {
+        contract_deployer = msg.sender;
+    }
 
     
-    event OrderCreation(address seller, address buyer, OrderStatus order_status);
-    event OrderElimination(address seller, address buyer, OrderStatus order_status);
-    event OrderDelivered(address seller, address buyer, OrderStatus order_status);
-    event OrderCancellaition(address seller, address buyer, OrderStatus order_status);
+    event OrderCreation(address seller, address customer, string msz);
+    event OrderElimination(address seller, address customer, string msz);
+    event OrderDelivery(address seller, address customer, string msz);
+    event OrderCancellaition(address seller, address customer, string msz);
+    event OrderShipping(address seller, address customer, string msz);
+    event OrderConfirmation(address seller, address customer, string msz);
+    event ReceiveOrder(address deliveryMan, address customer, string msz);
+    event AdjustmentRequestEvent(address seller, string msz);
+    event ReputationPointAward(address seller, string msz);
     
     
     
-    function setDetails( address _buyer_address, address _seller_address, string memory _product_id, uint256 _delivery_time, 
-    int _product_price, int _oldbalanceOrg_, int _newbalanceOrig_, int _oldbalanceDest_, int _newbalanceDest_, Type _type_) public { 
-        buyer_address = _buyer_address;
-        seller_address = _seller_address;
+    function setDetails( string memory _product_id, uint256 _delivery_time, int _product_price, int _oldbalanceOrg_, int _newbalanceOrig_,
+    int _oldbalanceDest_, int _newbalanceDest_, Type _type_) public onlyContractDeployer { 
         product_id = _product_id;
         delivery_time = _delivery_time;
         product_price = _product_price;
@@ -165,43 +184,124 @@ contract OrderContract is TermContract{
     }
     
     
-    
-    function place_order() public {
-         order_placing_time = block.timestamp;
+    function place_order() public onlyCustomer{
          
          if(TermContract.isFraud(amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, newbalanceDest, transactionType) == true){
-             ordercurrentstatus = OrderCurrentState.Fraudulent_behavior_detected;
-             emit OrderElimination(seller_address, buyer_address, OrderStatus.msz2);
+             ordercurrentstatus = OrderCurrentState.Fraudulent_Behavior_Detected;
+             viewCurrentTrace = "Fraudulent behavior detected";
+             emit OrderElimination(seller_address, customer_address, msz2);
          }
          else{
-             OrderMap[buyer_address] = Order(buyer_address, seller_address, product_id, delivery_time, product_price, block.timestamp);
+             OrderMap[customer_address] = Order(customer_address, seller_address, product_id, delivery_time, product_price, block.timestamp);
              ordercurrentstatus = OrderCurrentState.Order_Placed;
-             emit OrderCreation(seller_address, buyer_address,OrderStatus.msz1);
-             viewCurrentTrace = "Order Placed";
+             viewCurrentTrace = "Order placed";
+             emit OrderCreation(seller_address, customer_address, msz1);
          }
+    }
+    
+    function confirm_order() public onlySeller{
+        
+        order_placing_time = block.timestamp;
+        
+        if(ordercurrentstatus == OrderCurrentState.Order_Placed){
+             ordercurrentstatus = OrderCurrentState.Order_Confirmed;
+             viewCurrentTrace = "Order confirmed";
+             emit OrderConfirmation(seller_address, customer_address, msz7);
+        }
     }
     
 
-    function Order_Delivery() public {
+    function initiate_delivery() public onlySeller{
         
         order_delivery_time = block.timestamp;
         
-        if(order_delivery_time - order_placing_time <= delivery_time){
-            ordercurrentstatus = OrderCurrentState.Order_Shipped;
-            emit OrderDelivered(order.seller_address, order.buyer_address, OrderStatus.msz3);
+        if(order_delivery_time - order_placing_time <= delivery_time && ordercurrentstatus == OrderCurrentState. Order_Confirmed){
+            ordercurrentstatus = OrderCurrentState.Product_Delivered;
+            viewCurrentTrace = "Order delivered";
+            emit OrderDelivery(seller_address, customer_address, msz3);
         }
         else{
-            ordercurrentstatus = OrderCurrentState.Time_limit_exceeded;
-            emit OrderCancellaition(order.seller_address, order.buyer_address, OrderStatus.msz4);
+            ordercurrentstatus = OrderCurrentState.Time_Limit_Exceeded;
+            viewCurrentTrace = "Order cancelled due to time limit";
+            emit OrderCancellaition(seller_address, customer_address, msz4);
         }
     }
-    function getCurrentStatus() public view returns(string memory) {
+    
+    function ship_order() public onlyDeliveryMan{
+        if(ordercurrentstatus == OrderCurrentState.Product_Delivered){
+            viewCurrentTrace = "Order is in shipping stage";
+            ordercurrentstatus = OrderCurrentState.Order_Reached;
+            emit OrderShipping(seller_address, customer_address, msz8);
+        }
+    }
+    
+    
+    function receive_order() public onlyCustomer{
+        if(ordercurrentstatus == OrderCurrentState.Order_Reached)
+        viewCurrentTrace = "Order received by customer";
+        emit ReceiveOrder(delivery_man_address, customer_address, msz9);
+    }
+    
+    
+    function order_delivery_confirmation() public onlyDeliveryMan{
+        if(response == 1 && ordercurrentstatus == OrderCurrentState.Order_Reached){
+            ordercurrentstatus = OrderCurrentState.Order_Shipped;
+            viewCurrentTrace = "Order shipped";
+            positive_review();
+            emit OrderShipping(seller_address, customer_address, msz5);
+            emit ReputationPointAward(seller_address, "+1 reputation added to the seller address");
+        }
+        else if (response == 2 && ordercurrentstatus == OrderCurrentState.Order_Reached){
+            ordercurrentstatus = OrderCurrentState.Product_Not_Satisfactory;
+            viewCurrentTrace = "Unsatisfactory Order delivery";
+            negative_review();
+            emit OrderShipping(seller_address, customer_address, msz6);
+            emit ReputationPointAward(seller_address, "-1 reputation added to the seller address");
+        }
+        else if (response == 3 && ordercurrentstatus == OrderCurrentState.Order_Reached){
+            ordercurrentstatus = OrderCurrentState.Product_Not_Satisfactory;
+            viewCurrentTrace = "Very unsatisfactory Order delivery";
+            scam_by_advertisement();
+            emit OrderShipping(seller_address, customer_address, description);
+            emit ReputationPointAward(seller_address, "-3 reputation added to the seller address");
+        }
+    }
+    
+    function adjustment_request(string memory msz) public onlySeller{
+        emit AdjustmentRequestEvent(seller_address, msz);
+    }
+
+    
+    function set_response(uint256 _response) public onlyCustomer{
+        response = _response;
+    }
+    
+    function set_fraudulent_description(string memory _description) public onlyCustomer{
+        description = _description;
+    }
+    
+    function perform_diagnosis(address _seller_address) public onlyContractDeployer {
+      Review[_seller_address] -= 1;
+    }
+    
+  
+    function track_order() internal view returns (OrderCurrentState) {
+        return ordercurrentstatus;
+    }
+    
+    function order_status() public view returns(string memory) {
         return viewCurrentTrace;
     }
-    function Order_Status() public view returns (OrderCurrentState) {
-    return ordercurrentstatus;
+    
+    function positive_review() internal {
+      Review[seller_address] += 1;
     }
     
+    function negative_review() internal {
+      Review[seller_address] -= 1;
+    }
     
-    
+    function scam_by_advertisement() internal {
+      Review[seller_address] -= 3;
+    }
 }
